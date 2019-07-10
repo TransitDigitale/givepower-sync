@@ -139,6 +139,10 @@ class SpectraController extends DeviceController
 
             foreach($cells as $cellIndex => $cell) {
 
+                if(!isset($firstCells[$cellIndex])) {
+                    continue;
+                }
+
                 // remove invisible characters
                 $cell = str_replace(["\t", "\n\r", "\n", "\r"], '', $cell);
 
@@ -146,6 +150,7 @@ class SpectraController extends DeviceController
                 if(is_numeric($cell)) {
                     $cell = (float) $cell;
                 }
+
 
                 $headerCell = str_replace([" ", "\t", "\n\r", "\n", "\r"], '', $firstCells[$cellIndex]);
                 if($headerCell) {
