@@ -33,7 +33,7 @@ class SpectraController extends DeviceController
 
 
         // find lastest log time_stamp from that spectra device to avoid saving old logs from files
-        $lastTime= Spectra::where('device_name', $device->name)->max('time_stamp', 'DESC');
+        $lastTime = Spectra::where('device_name', $device->name)->max('time_stamp', 'DESC');
 
         // Replace tank_level_1 and tank_level_2 psi value (engunit) to percentage value (raw)
         // and return only the engunit data (English Unit measures)
@@ -46,7 +46,8 @@ class SpectraController extends DeviceController
                 $engunitResults[$key]['device_name'] = $device->name;
             }
 
-            if(new DateTime($engunitResults[$key]['time_stamp']) > new DateTime($lastTime)) {
+            // If it's the first time for this Spectra Device OR the last time for it is older than the new times, then insert record
+            if(!$lastTime || new DateTime($engunitResults[$key]['time_stamp']) > new DateTime($lastTime)) {
                 Spectra::insertIgnore($engunitResults[$key]);
             }
         }
@@ -138,10 +139,6 @@ class SpectraController extends DeviceController
             $cells = explode("\t", $row);
 
             foreach($cells as $cellIndex => $cell) {
-
-                if(!isset($firstCells[$cellIndex])) {
-                    continue;
-                }
 
                 // remove invisible characters
                 $cell = str_replace(["\t", "\n\r", "\n", "\r"], '', $cell);
